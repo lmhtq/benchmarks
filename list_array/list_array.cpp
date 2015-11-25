@@ -5,10 +5,8 @@
 #include <assert.h>
 
 unsigned long loop_time = 100;
-unsigned long item_num = 10000;
-const int item_size = 1024;
-
-long sum = 0;
+unsigned long item_num = 1000;
+const int item_size = 128;
 
 void show_usage(char *cmd)
 {
@@ -26,20 +24,20 @@ void array_test()
 
     timeval st, end;
     gettimeofday(&st, NULL);
-    sum = 0;
 
     for (int i = 0; i < loop_time; i++) {
-        struct item tmp = items[i];
-        for (int j = 0; j < item_size; j++) {
-            tmp.data[j]++;
-            sum++;
+        for (int j = 0; j < item_num; j++) {
+            for (int k = 0; k < item_size; k++) {
+                struct item tmp = items[i];
+                tmp.data[j]++;
+            }
         }
     }
 
 
     gettimeofday(&end, NULL);
     double span = (end.tv_sec - st.tv_sec)*1000.0 + (end.tv_usec - st.tv_usec)/1000.0;
-    printf("sum: %d, array_test: %lfms\n", sum, span);    
+    printf("array_test: %lfms\n", span);    
 }
 
 void list_test()
@@ -72,6 +70,14 @@ void list_test()
                 tmp->data[j]++;
         }
 
+    }
+
+    while(tmp = TAILQ_FIRST(&item_list)) {
+        TAILQ_REMOVE(&item_list, tmp, item_link);
+        free(tmp);
+    }
+    if (!TAILQ_EMPTY(&item_list)) {
+        printf("TAILQ doesnt free!\n");
     }
 
     gettimeofday(&end, NULL);
@@ -111,6 +117,14 @@ void list_withpool_test()
 
     }
 
+    while(tmp = TAILQ_FIRST(&item_list)) {
+        TAILQ_REMOVE(&item_list, tmp, item_link);
+        free(tmp);
+    }
+    if (!TAILQ_EMPTY(&item_list)) {
+        printf("TAILQ doesnt free!\n");
+    }
+
     gettimeofday(&end, NULL);
     double span = (end.tv_sec - st.tv_sec)*1000.0 + (end.tv_usec - st.tv_usec)/1000.0;
     printf("list_withpool_test: %lfms\n", span);    
@@ -144,10 +158,18 @@ void list_withprefetch_test()
         TAILQ_FOREACH(tmp, &item_list, item_link) {
             for (int j = 0; j < item_size; j++) {
                 tmp->data[j]++;
-                __builtin_prefetch(&tmp->data[j+10], 0, 1);
+                __builtin_prefetch(&tmp->data[j+65], 0, 1);
             }
         }
 
+    }
+
+    while(tmp = TAILQ_FIRST(&item_list)) {
+        TAILQ_REMOVE(&item_list, tmp, item_link);
+        free(tmp);
+    }
+    if (!TAILQ_EMPTY(&item_list)) {
+        printf("TAILQ doesnt free!\n");
     }
 
     gettimeofday(&end, NULL);
