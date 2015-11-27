@@ -27,9 +27,9 @@ void array_test()
 
     for (int i = 0; i < loop_time; i++) {
         for (int j = 0; j < item_num; j++) {
+            struct item tmp = items[j];
             for (int k = 0; k < item_size; k++) {
-                struct item tmp = items[i];
-                tmp.data[j]++;
+                tmp.data[k]++;
             }
         }
     }
@@ -119,11 +119,12 @@ void list_withpool_test()
 
     while(tmp = TAILQ_FIRST(&item_list)) {
         TAILQ_REMOVE(&item_list, tmp, item_link);
-        free(tmp);
+        tmp = NULL;
     }
     if (!TAILQ_EMPTY(&item_list)) {
         printf("TAILQ doesnt free!\n");
     }
+
 
     gettimeofday(&end, NULL);
     double span = (end.tv_sec - st.tv_sec)*1000.0 + (end.tv_usec - st.tv_usec)/1000.0;
@@ -166,7 +167,7 @@ void list_withprefetch_test()
 
     while(tmp = TAILQ_FIRST(&item_list)) {
         TAILQ_REMOVE(&item_list, tmp, item_link);
-        free(tmp);
+        tmp = NULL;
     }
     if (!TAILQ_EMPTY(&item_list)) {
         printf("TAILQ doesnt free!\n");
