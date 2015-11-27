@@ -25,11 +25,12 @@ void array_test()
     timeval st, end;
     gettimeofday(&st, NULL);
 
+    struct item *tmp;
     for (int i = 0; i < loop_time; i++) {
         for (int j = 0; j < item_num; j++) {
-            struct item tmp = items[j];
+            tmp = items + j;
             for (int k = 0; k < item_size; k++) {
-                tmp.data[k]++;
+                tmp->data[k]++;
             }
         }
     }
@@ -72,6 +73,10 @@ void list_test()
 
     }
 
+    gettimeofday(&end, NULL);
+    double span = (end.tv_sec - st.tv_sec)*1000.0 + (end.tv_usec - st.tv_usec)/1000.0;
+    printf("list_test: %lfms\n", span);    
+    
     while(tmp = TAILQ_FIRST(&item_list)) {
         TAILQ_REMOVE(&item_list, tmp, item_link);
         free(tmp);
@@ -80,9 +85,6 @@ void list_test()
         printf("TAILQ doesnt free!\n");
     }
 
-    gettimeofday(&end, NULL);
-    double span = (end.tv_sec - st.tv_sec)*1000.0 + (end.tv_usec - st.tv_usec)/1000.0;
-    printf("list_test: %lfms\n", span);    
 }
 
 void list_withpool_test()
@@ -117,6 +119,10 @@ void list_withpool_test()
 
     }
 
+    gettimeofday(&end, NULL);
+    double span = (end.tv_sec - st.tv_sec)*1000.0 + (end.tv_usec - st.tv_usec)/1000.0;
+    printf("list_withpool_test: %lfms\n", span);    
+    
     while(tmp = TAILQ_FIRST(&item_list)) {
         TAILQ_REMOVE(&item_list, tmp, item_link);
         tmp = NULL;
@@ -125,10 +131,6 @@ void list_withpool_test()
         printf("TAILQ doesnt free!\n");
     }
 
-
-    gettimeofday(&end, NULL);
-    double span = (end.tv_sec - st.tv_sec)*1000.0 + (end.tv_usec - st.tv_usec)/1000.0;
-    printf("list_withpool_test: %lfms\n", span);    
 }
 
 void list_withprefetch_test()
@@ -165,6 +167,10 @@ void list_withprefetch_test()
 
     }
 
+    gettimeofday(&end, NULL);
+    double span = (end.tv_sec - st.tv_sec)*1000.0 + (end.tv_usec - st.tv_usec)/1000.0;
+    printf("list_withprefetch_test: %lfms\n", span);    
+    
     while(tmp = TAILQ_FIRST(&item_list)) {
         TAILQ_REMOVE(&item_list, tmp, item_link);
         tmp = NULL;
@@ -173,9 +179,6 @@ void list_withprefetch_test()
         printf("TAILQ doesnt free!\n");
     }
 
-    gettimeofday(&end, NULL);
-    double span = (end.tv_sec - st.tv_sec)*1000.0 + (end.tv_usec - st.tv_usec)/1000.0;
-    printf("list_withprefetch_test: %lfms\n", span);    
 }
 
 int main(int argc, char *argv[])
